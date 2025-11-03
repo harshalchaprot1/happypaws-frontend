@@ -1,24 +1,100 @@
-<!-- src/app/components/pet-list/pet-list.component.html -->
-<h2>Available Pets for Adoption</h2>
-<h2>git from mds</h2>
-<div>
-  <input [(ngModel)]="searchText" placeholder="Search by name or breed" />
-</div>
-<div *ngIf="pets.length === 0">Loading pets...</div>
-<div *ngIf="pets.length > 0 && filteredPets.length === 0">No results found.</div>
+<!-- Beautiful Material-based Pet List Template -->
+<div class="pet-list-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <h1 class="page-title">
+      <mat-icon>pets</mat-icon>
+      Available Pets for Adoption
+    </h1>
+    <p class="subtitle">Find your perfect companion</p>
+  </div>
 
-<div *ngFor="let pet of filteredPets" class="pet-card">
-  <img [src]="pet.imageUrl" alt="{{ pet.name }}" width="150" />
-  <h3>{{ pet.name }} ({{ pet.species }})</h3>
-  <p><strong>Breed:</strong> {{ pet.breed }}</p>
-  <p><strong>Age:</strong> {{ pet.age }} years</p>
-  <p><strong>Gender:</strong> {{ pet.gender }}</p>
-  <p><strong>Description:</strong> {{ pet.description }}</p>
-  <p><strong>Status:</strong> {{ pet.status }}</p>
-  <div>
-    <button (click)="adoptPet(pet.id!)" [disabled]="pet.status === 'ADOPTED'">
-      {{ pet.status === 'ADOPTED' ? 'Adopted' : 'Mark as Adopted' }}
-    </button>
-    <button (click)="deletePet(pet.id)">Delete</button>
+  <!-- Search Bar -->
+  <mat-card class="search-card">
+    <mat-form-field class="full-width" appearance="outline">
+      <mat-label>Search pets</mat-label>
+      <input matInput [(ngModel)]="searchText" placeholder="Search by name or breed">
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+  </mat-card>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner></mat-spinner>
+    <p>Loading adorable pets...</p>
+  </div>
+
+  <!-- No Results Message -->
+  <mat-card *ngIf="!loading && pets.length > 0 && filteredPets.length === 0" class="no-results">
+    <mat-icon>search_off</mat-icon>
+    <h3>No pets found</h3>
+    <p>Try adjusting your search terms</p>
+  </mat-card>
+
+  <!-- Empty State -->
+  <mat-card *ngIf="!loading && pets.length === 0" class="empty-state">
+    <mat-icon>pets</mat-icon>
+    <h3>No pets available yet</h3>
+    <p>Check back soon for new furry friends!</p>
+  </mat-card>
+
+  <!-- Pet Grid -->
+  <div class="pet-grid" *ngIf="!loading && filteredPets.length > 0">
+    <mat-card *ngFor="let pet of filteredPets" class="pet-card" (click)="viewPetDetails(pet.id!)">
+      <!-- Pet Image -->
+      <div class="pet-image-container">
+        <img mat-card-image [src]="pet.imageUrl" [alt]="pet.name" class="pet-image">
+        <!-- Status Chip -->
+        <mat-chip-set class="status-chip-set">
+          <mat-chip [ngClass]="getStatusClass(pet.status)">
+            <mat-icon>{{getStatusIcon(pet.status)}}</mat-icon>
+            {{pet.status}}
+          </mat-chip>
+        </mat-chip-set>
+      </div>
+
+      <!-- Pet Info -->
+      <mat-card-header>
+        <mat-card-title>{{pet.name}}</mat-card-title>
+        <mat-card-subtitle>{{pet.species}} • {{pet.breed}}</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="pet-details">
+          <div class="detail-item">
+            <mat-icon>calendar_today</mat-icon>
+            <span>{{pet.age}} years old</span>
+          </div>
+          <div class="detail-item">
+            <mat-icon>wc</mat-icon>
+            <span>{{pet.gender}}</span>
+          </div>
+        </div>
+        <p class="description">{{pet.description | slice:0:100}}{{pet.description && pet.description.length > 100 ? '...' : ''}}</p>
+      </mat-card-content>
+
+      <!-- Actions -->
+      <mat-card-actions>
+        <button mat-raised-button color="primary" (click)="viewPetDetails(pet.id!); $event.stopPropagation()">
+          <mat-icon>visibility</mat-icon>
+          View Details
+        </button>
+        <button 
+          mat-raised-button 
+          color="accent" 
+          (click)="adoptPet(pet.id!); $event.stopPropagation()"
+          [disabled]="pet.status === 'ADOPTED'">
+          <mat-icon>favorite</mat-icon>
+          {{pet.status === 'ADOPTED' ? 'Adopted' : 'Adopt'}}
+        </button>
+        <button 
+          mat-icon-button 
+          color="warn" 
+          (click)="deletePet(pet.id!); $event.stopPropagation()"
+          matTooltip="Delete pet">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </mat-card-actions>
+    </mat-card>
   </div>
 </div>

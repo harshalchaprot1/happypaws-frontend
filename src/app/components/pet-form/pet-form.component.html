@@ -1,65 +1,199 @@
-<form #petForm="ngForm" (ngSubmit)="onSubmit(petForm)" novalidate>
-	<div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+<div class="form-container">
+  <mat-card class="pet-form-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>{{ isEditMode ? 'edit' : 'add_circle' }}</mat-icon>
+        {{ isEditMode ? 'Edit Pet' : 'Add New Pet' }}
+      </mat-card-title>
+      <mat-card-subtitle>
+        {{ isEditMode ? 'Update pet information' : 'Register a new pet for adoption' }}
+      </mat-card-subtitle>
+    </mat-card-header>
 
-	<div>
-		<label for="name">Name</label>
-		<input id="name" name="name" required minlength="2" [(ngModel)]="pet.name" />
-		<div *ngIf="petForm.submitted && !pet.name" class="field-error">Name is required.</div>
-	</div>
+    <mat-card-content>
+      <div *ngIf="loading" class="loading-overlay">
+        <mat-spinner></mat-spinner>
+      </div>
 
-	<div>
-		<label for="species">Species</label>
-		<input id="species" name="species" required [(ngModel)]="pet.species" />
-	</div>
+      <form #petForm="ngForm" (ngSubmit)="onSubmit(petForm)" novalidate>
+        <!-- Basic Information Section -->
+        <div class="form-section">
+          <h3 class="section-title">Basic Information</h3>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Pet Name</mat-label>
+              <input matInput 
+                     id="name" 
+                     name="name" 
+                     required 
+                     minlength="2"
+                     [(ngModel)]="pet.name"
+                     placeholder="Enter pet's name">
+              <mat-icon matPrefix>pets</mat-icon>
+              <mat-error *ngIf="petForm.submitted && !pet.name">Name is required</mat-error>
+            </mat-form-field>
+          </div>
 
-	<div>
-		<label for="breed">Breed</label>
-		<input id="breed" name="breed" [(ngModel)]="pet.breed" />
-	</div>
+          <div class="form-row two-columns">
+            <mat-form-field appearance="outline">
+              <mat-label>Species</mat-label>
+              <mat-select id="species" 
+                          name="species" 
+                          required 
+                          [(ngModel)]="pet.species"
+                          placeholder="Select species">
+                <mat-option *ngFor="let species of speciesOptions" [value]="species">
+                  {{ species }}
+                </mat-option>
+              </mat-select>
+              <mat-icon matPrefix>category</mat-icon>
+              <mat-error>Species is required</mat-error>
+            </mat-form-field>
 
-	<div>
-		<label for="age">Age</label>
-		<input id="age" name="age" type="number" min="0" required [(ngModel)]="pet.age" />
-	</div>
+            <mat-form-field appearance="outline">
+              <mat-label>Breed</mat-label>
+              <input matInput 
+                     id="breed" 
+                     name="breed" 
+                     [(ngModel)]="pet.breed"
+                     placeholder="Enter breed">
+              <mat-icon matPrefix>label</mat-icon>
+            </mat-form-field>
+          </div>
 
-	<div>
-		<label for="gender">Gender</label>
-		<select id="gender" name="gender" required [(ngModel)]="pet.gender">
-			<option value="">--Select--</option>
-			<option value="MALE">Male</option>
-			<option value="FEMALE">Female</option>
-			<option value="UNKNOWN">Unknown</option>
-		</select>
-	</div>
+          <div class="form-row two-columns">
+            <mat-form-field appearance="outline">
+              <mat-label>Age (years)</mat-label>
+              <input matInput 
+                     type="number" 
+                     id="age" 
+                     name="age" 
+                     min="0" 
+                     required 
+                     [(ngModel)]="pet.age"
+                     placeholder="0">
+              <mat-icon matPrefix>cake</mat-icon>
+              <mat-error>Age is required</mat-error>
+            </mat-form-field>
 
-	<div>
-		<label for="description">Description</label>
-		<textarea id="description" name="description" rows="4" [(ngModel)]="pet.description"></textarea>
-	</div>
+            <mat-form-field appearance="outline">
+              <mat-label>Gender</mat-label>
+              <mat-select id="gender" 
+                          name="gender" 
+                          required 
+                          [(ngModel)]="pet.gender"
+                          placeholder="Select gender">
+                <mat-option *ngFor="let option of genderOptions" [value]="option.value">
+                  {{ option.label }}
+                </mat-option>
+              </mat-select>
+              <mat-icon matPrefix>wc</mat-icon>
+              <mat-error>Gender is required</mat-error>
+            </mat-form-field>
+          </div>
+        </div>
 
-	<div>
-		<label for="imageUrl">Image URL</label>
-		<input id="imageUrl" name="imageUrl" [(ngModel)]="pet.imageUrl" />
-	</div>
+        <!-- Description Section -->
+        <div class="form-section">
+          <h3 class="section-title">Description</h3>
+          
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Pet Description</mat-label>
+            <textarea matInput 
+                      id="description" 
+                      name="description" 
+                      rows="5"
+                      [(ngModel)]="pet.description"
+                      placeholder="Describe the pet's personality, habits, special needs, etc."></textarea>
+            <mat-icon matPrefix>description</mat-icon>
+            <mat-hint>Share details that will help find the perfect home</mat-hint>
+          </mat-form-field>
+        </div>
 
-	<div>
-		<label for="type">Type</label>
-		<input id="type" name="type" [(ngModel)]="pet.type" />
-	</div>
+        <!-- Image Section -->
+        <div class="form-section">
+          <h3 class="section-title">Photo</h3>
+          
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Image URL</mat-label>
+            <input matInput 
+                   id="imageUrl" 
+                   name="imageUrl" 
+                   [(ngModel)]="pet.imageUrl"
+                   (ngModelChange)="onImageUrlChange()"
+                   placeholder="https://example.com/pet-photo.jpg">
+            <mat-icon matPrefix>image</mat-icon>
+            <mat-hint>Paste a direct link to the pet's photo</mat-hint>
+          </mat-form-field>
 
-	<div>
-		<label for="status">Status</label>
-		<select id="status" name="status" [(ngModel)]="pet.status">
-			<option value="AVAILABLE">Available</option>
-			<option value="PENDING">Pending</option>
-			<option value="ADOPTED">Adopted</option>
-		</select>
-	</div>
+          <div *ngIf="imagePreview" class="image-preview-container">
+            <img [src]="imagePreview" 
+                 alt="Pet preview" 
+                 class="image-preview"
+                 (error)="imagePreview = null">
+          </div>
+        </div>
 
-	<div>
-		<button type="submit" [disabled]="petForm.invalid || loading">
-			<span *ngIf="!loading">Add Pet</span>
-			<span *ngIf="loading">Saving...</span>
-		</button>
-	</div>
-</form>
+        <!-- Status & Type Section -->
+        <div class="form-section">
+          <h3 class="section-title">Additional Information</h3>
+          
+          <div class="form-row two-columns">
+            <mat-form-field appearance="outline">
+              <mat-label>Type</mat-label>
+              <input matInput 
+                     id="type" 
+                     name="type" 
+                     [(ngModel)]="pet.type"
+                     placeholder="e.g., Indoor, Outdoor">
+              <mat-icon matPrefix>info</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Status</mat-label>
+              <mat-select id="status" 
+                          name="status" 
+                          [(ngModel)]="pet.status"
+                          placeholder="Select status">
+                <mat-option *ngFor="let option of statusOptions" [value]="option.value">
+                  {{ option.label }}
+                </mat-option>
+              </mat-select>
+              <mat-icon matPrefix>check_circle</mat-icon>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <mat-card-actions class="form-actions">
+          <button mat-raised-button 
+                  type="button" 
+                  (click)="onCancel()"
+                  [disabled]="loading">
+            <mat-icon>close</mat-icon>
+            Cancel
+          </button>
+
+          <button mat-raised-button 
+                  type="button" 
+                  color="warn"
+                  (click)="onReset(petForm)"
+                  [disabled]="loading || isEditMode">
+            <mat-icon>refresh</mat-icon>
+            Reset
+          </button>
+
+          <button mat-raised-button 
+                  type="submit" 
+                  color="primary"
+                  [disabled]="petForm.invalid || loading">
+            <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
+            <mat-icon *ngIf="!loading">{{ isEditMode ? 'save' : 'add' }}</mat-icon>
+            <span *ngIf="!loading">{{ isEditMode ? 'Update Pet' : 'Add Pet' }}</span>
+          </button>
+        </mat-card-actions>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

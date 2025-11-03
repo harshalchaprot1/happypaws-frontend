@@ -1,6 +1,17 @@
-<nav>
-  <a routerLink="/">Home</a>
-  <a routerLink="/add">Add Pet</a>
-</nav>
+<mat-toolbar color="primary" class="app-toolbar">
+  <mat-icon class="toolbar-icon">pets</mat-icon>
+  <span class="app-title">{{ title }}</span>
+  <span class="spacer"></span>
+  <button mat-button routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">
+    <mat-icon>home</mat-icon>
+    Home
+  </button>
+  <button mat-button routerLink="/add" routerLinkActive="active-link">
+    <mat-icon>add_circle</mat-icon>
+    Add Pet
+  </button>
+</mat-toolbar>
 
-<router-outlet></router-outlet>
+<div class="content-wrapper">
+  <router-outlet></router-outlet>
+</div>

@@ -1,35 +1,160 @@
-<section class="pet-detail" *ngIf="!loading && pet; else loadingOrError">
-		<div class="pet-image">
-			<img [src]="pet.imageUrl" [alt]="pet.name || 'Pet image'" (error)="$any($event.target).style.display='none'" />
-		</div>
+<div class="detail-container">
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner></mat-spinner>
+    <p>Loading pet details...</p>
+  </div>
 
-	<div class="pet-info">
-		<header>
-					<h2>{{ pet.name }} <span class="badge" [ngClass]="{
-						'available': pet.status === 'AVAILABLE',
-						'pending': pet.status === 'PENDING',
-						'adopted': pet.status === 'ADOPTED'
-					}">{{ pet.status }}</span></h2>
-					<div class="meta">{{ pet.species }} • {{ pet.breed }} • {{ pet.age }} years • {{ pet.gender }}</div>
-		</header>
+  <!-- Error State -->
+  <mat-card *ngIf="!loading && errorMessage" class="error-card">
+    <mat-card-content>
+      <div class="error-content">
+        <mat-icon color="warn">error</mat-icon>
+        <h3>{{ errorMessage }}</h3>
+        <button mat-raised-button color="primary" (click)="goBack()">
+          <mat-icon>arrow_back</mat-icon>
+          Go Back
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
 
-		<div class="description">
-			<strong>Description</strong>
-			<p *ngIf="pet.description; else noDesc">{{ pet.description }}</p>
-			<ng-template #noDesc><p class="muted">No description provided.</p></ng-template>
-		</div>
+  <!-- Pet Detail Content -->
+  <div *ngIf="!loading && pet" class="pet-detail-content">
+    <!-- Back Button -->
+    <button mat-icon-button class="back-button" (click)="goBack()" matTooltip="Back to list">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
 
-		<div class="actions">
-			<button (click)="goEdit()" [disabled]="actionPending">Edit</button>
-			<button class="danger" (click)="deletePet()" [disabled]="actionPending">Delete</button>
-					<button class="secondary" (click)="markAsAdopted()" [disabled]="actionPending || pet.status === 'ADOPTED'">
-						{{ pet.status === 'ADOPTED' ? 'Adopted' : 'Mark as Adopted' }}
-			</button>
-		</div>
-	</div>
-</section>
+    <mat-card class="pet-detail-card">
+      <!-- Pet Image Section -->
+      <div class="pet-image-section">
+        <img [src]="pet.imageUrl || 'https://via.placeholder.com/600x400?text=No+Image'" 
+             [alt]="pet.name" 
+             class="pet-image"
+             (error)="$any($event.target).src='https://via.placeholder.com/600x400?text=No+Image'">
+        
+        <div class="image-overlay">
+          <mat-chip-set>
+            <mat-chip [ngClass]="getStatusClass()">
+              <mat-icon matChipAvatar>{{ getStatusIcon() }}</mat-icon>
+              {{ pet.status }}
+            </mat-chip>
+          </mat-chip-set>
+        </div>
+      </div>
 
-<ng-template #loadingOrError>
-	<div *ngIf="loading">Loading pet...</div>
-	<div *ngIf="!loading && errorMessage" class="error">{{ errorMessage }}</div>
-</ng-template>
+      <mat-card-content class="pet-info-section">
+        <!-- Header -->
+        <div class="pet-header">
+          <h1 class="pet-name">
+            <mat-icon>pets</mat-icon>
+            {{ pet.name }}
+          </h1>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <!-- Basic Info Grid -->
+        <div class="info-grid">
+          <div class="info-item">
+            <mat-icon>category</mat-icon>
+            <div class="info-content">
+              <span class="info-label">Species</span>
+              <span class="info-value">{{ pet.species }}</span>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <mat-icon>label</mat-icon>
+            <div class="info-content">
+              <span class="info-label">Breed</span>
+              <span class="info-value">{{ pet.breed || 'Unknown' }}</span>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <mat-icon>cake</mat-icon>
+            <div class="info-content">
+              <span class="info-label">Age</span>
+              <span class="info-value">{{ pet.age }} {{ pet.age === 1 ? 'year' : 'years' }}</span>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <mat-icon>wc</mat-icon>
+            <div class="info-content">
+              <span class="info-label">Gender</span>
+              <span class="info-value">{{ pet.gender }}</span>
+            </div>
+          </div>
+
+          <div class="info-item" *ngIf="pet.type">
+            <mat-icon>info</mat-icon>
+            <div class="info-content">
+              <span class="info-label">Type</span>
+              <span class="info-value">{{ pet.type }}</span>
+            </div>
+          </div>
+
+          <div class="info-item" *ngIf="pet.createdAt">
+            <mat-icon>event</mat-icon>
+            <div class="info-content">
+              <span class="info-label">Added</span>
+              <span class="info-value">{{ pet.createdAt | date:'mediumDate' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <!-- Description Section -->
+        <div class="description-section">
+          <h3 class="section-title">
+            <mat-icon>description</mat-icon>
+            About {{ pet.name }}
+          </h3>
+          <p class="description-text" *ngIf="pet.description">
+            {{ pet.description }}
+          </p>
+          <p class="no-description" *ngIf="!pet.description">
+            <mat-icon>info_outline</mat-icon>
+            No description available for this pet.
+          </p>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <!-- Action Buttons -->
+        <mat-card-actions class="action-buttons">
+          <button mat-raised-button 
+                  color="primary"
+                  (click)="goEdit()"
+                  [disabled]="actionPending"
+                  matTooltip="Edit pet information">
+            <mat-icon>edit</mat-icon>
+            Edit
+          </button>
+
+          <button mat-raised-button 
+                  color="accent"
+                  (click)="markAsAdopted()"
+                  [disabled]="actionPending || pet.status === 'ADOPTED'"
+                  matTooltip="Mark this pet as adopted">
+            <mat-icon>{{ pet.status === 'ADOPTED' ? 'favorite' : 'favorite_border' }}</mat-icon>
+            {{ pet.status === 'ADOPTED' ? 'Adopted' : 'Mark as Adopted' }}
+          </button>
+
+          <button mat-raised-button 
+                  color="warn"
+                  (click)="deletePet()"
+                  [disabled]="actionPending"
+                  matTooltip="Delete this pet">
+            <mat-icon>delete</mat-icon>
+            Delete
+          </button>
+        </mat-card-actions>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
