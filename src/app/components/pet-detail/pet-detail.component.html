@@ -29,10 +29,10 @@
     <mat-card class="pet-detail-card">
       <!-- Pet Image Section -->
       <div class="pet-image-section">
-        <img [src]="pet.imageUrl && pet.imageUrl.startsWith('http') ? pet.imageUrl : getPlaceholderImage()" 
+        <img [src]="getImageUrl()" 
              [alt]="pet.name" 
              class="pet-image"
-             (error)="$any($event.target).src=getPlaceholderImage()">
+             (error)="onImageError()">
         
         <div class="image-overlay">
           <mat-chip-set>

@@ -5,7 +5,6 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -23,7 +22,6 @@ import { PetService } from '../../services/pet.service';
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
-    MatSelectModule,
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
@@ -51,18 +49,9 @@ export class PetFormComponent implements OnInit {
   loading = false;
   isEditMode = false;
   imagePreview: string | null = null;
-
-  speciesOptions = ['Dog', 'Cat', 'Bird', 'Rabbit', 'Other'];
-  genderOptions = [
-    { value: 'MALE', label: 'Male' },
-    { value: 'FEMALE', label: 'Female' },
-    { value: 'UNKNOWN', label: 'Unknown' }
-  ];
-  statusOptions = [
-    { value: 'AVAILABLE', label: 'Available' },
-    { value: 'PENDING', label: 'Pending' },
-    { value: 'ADOPTED', label: 'Adopted' }
-  ];
+  imageRetryCount = 0;
+  maxRetries = 20;
+  useDefaultImage = false;
 
   constructor(
     private petService: PetService, 
@@ -104,6 +93,30 @@ export class PetFormComponent implements OnInit {
 
   onImageUrlChange(): void {
     this.imagePreview = this.pet.imageUrl || null;
+    this.imageRetryCount = 0;
+    this.useDefaultImage = false;
+  }
+
+  onImageError(): void {
+    this.imageRetryCount++;
+    if (this.imageRetryCount >= this.maxRetries) {
+      this.useDefaultImage = true;
+      this.imagePreview = this.getDefaultImage();
+    }
+  }
+
+  getDefaultImage(): string {
+    const species = this.pet.species?.toLowerCase() || '';
+    if (species.includes('dog')) {
+      return 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400';
+    } else if (species.includes('cat')) {
+      return 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400';
+    } else if (species.includes('bird')) {
+      return 'https://images.unsplash.com/photo-1552728089-57bdde30beb3?w=400';
+    } else if (species.includes('rabbit')) {
+      return 'https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?w=400';
+    }
+    return 'https://images.unsplash.com/photo-1450778869180-41d0601e046e?w=400';
   }
 
   onSubmit(form: NgForm): void {

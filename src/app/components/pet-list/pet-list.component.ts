@@ -40,6 +40,9 @@ export class PetListComponent implements OnInit {
   pets: Pet[] = [];
   searchText = '';
   loading = false;
+  imageRetryMap: Map<number, number> = new Map();
+  maxRetries = 20;
+  failedImages: Set<number> = new Set();
 
   constructor(
     private petService: PetService,
@@ -152,17 +155,41 @@ export class PetListComponent implements OnInit {
 
   // Get appropriate placeholder image based on species
   getImageUrl(pet: Pet): string {
+    // If image has failed too many times, show default
+    if (pet.id && this.failedImages.has(pet.id)) {
+      return this.getDefaultImage(pet);
+    }
+    
     // Check if imageUrl is valid
     if (pet.imageUrl && pet.imageUrl.startsWith('http') && !pet.imageUrl.includes('dummy')) {
       return pet.imageUrl;
     }
     
+    return this.getDefaultImage(pet);
+  }
+
+  onImageError(pet: Pet): void {
+    if (!pet.id) return;
+    
+    const retryCount = this.imageRetryMap.get(pet.id) || 0;
+    this.imageRetryMap.set(pet.id, retryCount + 1);
+    
+    if (retryCount + 1 >= this.maxRetries) {
+      this.failedImages.add(pet.id);
+    }
+  }
+
+  private getDefaultImage(pet: Pet): string {
     // Return species-appropriate placeholder
     const species = pet.species?.toLowerCase();
     if (species === 'dog') {
       return 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&h=300&fit=crop';
     } else if (species === 'cat') {
       return 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400&h=300&fit=crop';
+    } else if (species === 'bird') {
+      return 'https://images.unsplash.com/photo-1552728089-57bdde30beb3?w=400&h=300&fit=crop';
+    } else if (species === 'rabbit') {
+      return 'https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?w=400&h=300&fit=crop';
     }
     return 'https://images.unsplash.com/photo-1450778869180-41d0601e046e?w=400&h=300&fit=crop';
   }

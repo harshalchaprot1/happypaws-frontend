@@ -36,6 +36,9 @@ export class PetDetailComponent implements OnInit {
   loading = false;
   errorMessage: string | null = null;
   actionPending = false;
+  imageRetryCount = 0;
+  maxRetries = 20;
+  useDefaultImage = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -160,6 +163,20 @@ export class PetDetailComponent implements OnInit {
     }
   }
 
+  onImageError(): void {
+    this.imageRetryCount++;
+    if (this.imageRetryCount >= this.maxRetries) {
+      this.useDefaultImage = true;
+    }
+  }
+
+  getImageUrl(): string {
+    if (this.useDefaultImage) {
+      return this.getPlaceholderImage();
+    }
+    return this.pet?.imageUrl || this.getPlaceholderImage();
+  }
+
   getPlaceholderImage(): string {
     // Return species-appropriate placeholder images
     if (!this.pet) return 'https://images.unsplash.com/photo-1450778869180-41d0601e046e?w=800&h=600&fit=crop';
@@ -169,6 +186,10 @@ export class PetDetailComponent implements OnInit {
       return 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=800&h=600&fit=crop';
     } else if (species === 'cat') {
       return 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=800&h=600&fit=crop';
+    } else if (species === 'bird') {
+      return 'https://images.unsplash.com/photo-1552728089-57bdde30beb3?w=800&h=600&fit=crop';
+    } else if (species === 'rabbit') {
+      return 'https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?w=800&h=600&fit=crop';
     }
     return 'https://images.unsplash.com/photo-1450778869180-41d0601e046e?w=800&h=600&fit=crop';
   }

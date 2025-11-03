@@ -47,7 +47,7 @@
              [src]="getImageUrl(pet)" 
              [alt]="pet.name" 
              class="pet-image"
-             (error)="$any($event.target).src=getImageUrl(pet)">
+             (error)="onImageError(pet)">
         <!-- Status Chip -->
         <mat-chip-set class="status-chip-set">
           <mat-chip [ngClass]="getStatusClass(pet.status)">
