@@ -46,17 +46,38 @@ export class PetDetailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.loadPet(+id);
+    // Try to get pet from navigation state first
+    const navigation = this.router.getCurrentNavigation();
+    const state = navigation?.extras?.state as { pet: Pet };
+    
+    if (state?.pet) {
+      // Pet data was passed through navigation
+      this.pet = state.pet;
+    } else {
+      // Fallback: Check if pet data exists in window.history.state
+      const historyState = window.history.state as { pet: Pet };
+      if (historyState?.pet) {
+        this.pet = historyState.pet;
+      } else {
+        // Last resort: Load all pets and find the one we need
+        const id = this.route.snapshot.paramMap.get('id');
+        if (id) {
+          this.loadPetFromList(+id);
+        }
+      }
     }
   }
 
-  loadPet(id: number): void {
+  loadPetFromList(id: number): void {
     this.loading = true;
-    this.petService.getPetById(id).subscribe({
-      next: (p: Pet) => {
-        this.pet = p;
+    this.petService.getPets().subscribe({
+      next: (pets: Pet[]) => {
+        const foundPet = pets.find(p => p.id === id);
+        if (foundPet) {
+          this.pet = foundPet;
+        } else {
+          this.errorMessage = 'Pet not found.';
+        }
         this.loading = false;
       },
       error: (err: any) => {
@@ -99,7 +120,7 @@ export class PetDetailComponent implements OnInit {
 
   markAsAdopted(): void {
     if (!this.pet?.id) return;
-    if (this.pet.status === 'ADOPTED') {
+    if (this.pet.status.toUpperCase() === 'ADOPTED') {
       this.showNotification('This pet has already been adopted', 'error');
       return;
     }
@@ -121,7 +142,7 @@ export class PetDetailComponent implements OnInit {
 
   getStatusClass(): string {
     if (!this.pet) return '';
-    switch (this.pet.status) {
+    switch (this.pet.status.toUpperCase()) {
       case 'AVAILABLE': return 'status-available';
       case 'PENDING': return 'status-pending';
       case 'ADOPTED': return 'status-adopted';
@@ -131,12 +152,25 @@ export class PetDetailComponent implements OnInit {
 
   getStatusIcon(): string {
     if (!this.pet) return 'pets';
-    switch (this.pet.status) {
+    switch (this.pet.status.toUpperCase()) {
       case 'AVAILABLE': return 'check_circle';
       case 'PENDING': return 'schedule';
       case 'ADOPTED': return 'favorite';
       default: return 'pets';
     }
+  }
+
+  getPlaceholderImage(): string {
+    // Return species-appropriate placeholder images
+    if (!this.pet) return 'https://images.unsplash.com/photo-1450778869180-41d0601e046e?w=800&h=600&fit=crop';
+    
+    const species = this.pet.species?.toLowerCase();
+    if (species === 'dog') {
+      return 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=800&h=600&fit=crop';
+    } else if (species === 'cat') {
+      return 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=800&h=600&fit=crop';
+    }
+    return 'https://images.unsplash.com/photo-1450778869180-41d0601e046e?w=800&h=600&fit=crop';
   }
 
   private showNotification(message: string, type: 'success' | 'error'): void {

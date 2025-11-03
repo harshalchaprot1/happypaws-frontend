@@ -81,10 +81,17 @@ export class PetFormComponent implements OnInit {
 
   loadPet(id: number): void {
     this.loading = true;
-    this.petService.getPetById(id).subscribe({
-      next: (data: Pet) => {
-        this.pet = data;
-        this.imagePreview = data.imageUrl || null;
+    // Load all pets and find the one we need
+    this.petService.getPets().subscribe({
+      next: (pets: Pet[]) => {
+        const foundPet = pets.find(p => p.id === id);
+        if (foundPet) {
+          this.pet = foundPet;
+          this.imagePreview = foundPet.imageUrl || null;
+        } else {
+          this.showNotification('Pet not found', 'error');
+          this.router.navigate(['/']);
+        }
         this.loading = false;
       },
       error: (err: any) => {

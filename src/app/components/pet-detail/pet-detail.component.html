@@ -29,10 +29,10 @@
     <mat-card class="pet-detail-card">
       <!-- Pet Image Section -->
       <div class="pet-image-section">
-        <img [src]="pet.imageUrl || 'https://via.placeholder.com/600x400?text=No+Image'" 
+        <img [src]="pet.imageUrl && pet.imageUrl.startsWith('http') ? pet.imageUrl : getPlaceholderImage()" 
              [alt]="pet.name" 
              class="pet-image"
-             (error)="$any($event.target).src='https://via.placeholder.com/600x400?text=No+Image'">
+             (error)="$any($event.target).src=getPlaceholderImage()">
         
         <div class="image-overlay">
           <mat-chip-set>
@@ -139,10 +139,10 @@
           <button mat-raised-button 
                   color="accent"
                   (click)="markAsAdopted()"
-                  [disabled]="actionPending || pet.status === 'ADOPTED'"
+                  [disabled]="actionPending || pet.status.toUpperCase() === 'ADOPTED'"
                   matTooltip="Mark this pet as adopted">
-            <mat-icon>{{ pet.status === 'ADOPTED' ? 'favorite' : 'favorite_border' }}</mat-icon>
-            {{ pet.status === 'ADOPTED' ? 'Adopted' : 'Mark as Adopted' }}
+            <mat-icon>{{ pet.status.toUpperCase() === 'ADOPTED' ? 'favorite' : 'favorite_border' }}</mat-icon>
+            {{ pet.status.toUpperCase() === 'ADOPTED' ? 'Adopted' : 'Mark as Adopted' }}
           </button>
 
           <button mat-raised-button 

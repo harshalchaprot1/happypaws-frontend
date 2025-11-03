@@ -23,18 +23,12 @@ export class PetService {
     return this.http.put<Pet>(`${this.apiUrl}/${id}`, pet);
   }
 
-  getPetById(id: number): Observable<Pet> {
-    return this.http.get<Pet>(`${this.apiUrl}/${id}`);
-  }
-
   deletePet(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
-  markAsAdopted(id: number): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/${id}/adopt`, {});
-
-
+  markAsAdopted(id: number): Observable<Pet> {
+    return this.http.patch<Pet>(`${this.apiUrl}/${id}/adopt`, {});
   }
 
 }

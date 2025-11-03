@@ -78,16 +78,20 @@ export class PetListComponent implements OnInit {
     );
   }
 
-  // Navigate to pet details page
-  viewPetDetails(id: number): void {
-    this.router.navigate(['/details', id]);
+  // Navigate to pet details page with pet data
+  viewPetDetails(petId: number): void {
+    const pet = this.pets.find(p => p.id === petId);
+    if (pet) {
+      // Pass the entire pet object through navigation state
+      this.router.navigate(['/details', petId], { state: { pet } });
+    }
   }
 
   adoptPet(id: number): void {
     const pet = this.pets.find(p => p.id === id);
     if (!pet) return;
 
-    if (pet.status === 'ADOPTED') {
+    if (pet.status.toUpperCase() === 'ADOPTED') {
       this.showNotification('This pet has already been adopted', 'info');
       return;
     }
@@ -134,7 +138,7 @@ export class PetListComponent implements OnInit {
 
   // Get icon name for status
   getStatusIcon(status: string): string {
-    switch (status) {
+    switch (status.toUpperCase()) {
       case 'AVAILABLE':
         return 'check_circle';
       case 'PENDING':
@@ -144,6 +148,23 @@ export class PetListComponent implements OnInit {
       default:
         return 'info';
     }
+  }
+
+  // Get appropriate placeholder image based on species
+  getImageUrl(pet: Pet): string {
+    // Check if imageUrl is valid
+    if (pet.imageUrl && pet.imageUrl.startsWith('http') && !pet.imageUrl.includes('dummy')) {
+      return pet.imageUrl;
+    }
+    
+    // Return species-appropriate placeholder
+    const species = pet.species?.toLowerCase();
+    if (species === 'dog') {
+      return 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&h=300&fit=crop';
+    } else if (species === 'cat') {
+      return 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400&h=300&fit=crop';
+    }
+    return 'https://images.unsplash.com/photo-1450778869180-41d0601e046e?w=400&h=300&fit=crop';
   }
 
   private showNotification(message: string, type: 'success' | 'error' | 'info'): void {

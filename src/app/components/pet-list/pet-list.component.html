@@ -43,7 +43,11 @@
     <mat-card *ngFor="let pet of filteredPets" class="pet-card" (click)="viewPetDetails(pet.id!)">
       <!-- Pet Image -->
       <div class="pet-image-container">
-        <img mat-card-image [src]="pet.imageUrl" [alt]="pet.name" class="pet-image">
+        <img mat-card-image 
+             [src]="getImageUrl(pet)" 
+             [alt]="pet.name" 
+             class="pet-image"
+             (error)="$any($event.target).src=getImageUrl(pet)">
         <!-- Status Chip -->
         <mat-chip-set class="status-chip-set">
           <mat-chip [ngClass]="getStatusClass(pet.status)">
@@ -83,9 +87,9 @@
           mat-raised-button 
           color="accent" 
           (click)="adoptPet(pet.id!); $event.stopPropagation()"
-          [disabled]="pet.status === 'ADOPTED'">
+          [disabled]="pet.status.toUpperCase() === 'ADOPTED'">
           <mat-icon>favorite</mat-icon>
-          {{pet.status === 'ADOPTED' ? 'Adopted' : 'Adopt'}}
+          {{pet.status.toUpperCase() === 'ADOPTED' ? 'Adopted' : 'Adopt'}}
         </button>
         <button 
           mat-icon-button 
