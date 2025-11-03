@@ -1,11 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
-//import { PetService } from '../services/pet.service';
-//import { Pet } from '../models/pet.model';
+import { PetService } from '../services/pet.service';
+import { Pet } from '../models/pet.model';
 import { Router, ActivatedRoute } from '@angular/router';
-import { Pet } from '../../models/pet.model';
-import { PetService } from '../../services/pet.service';
 
 @Component({
   selector: 'app-pet-form',

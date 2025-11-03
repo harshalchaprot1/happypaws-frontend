@@ -1,1 +1,35 @@
-<p>pet-detail works!</p>
+<section class="pet-detail" *ngIf="!loading && pet; else loadingOrError">
+		<div class="pet-image">
+			<img [src]="pet.imageUrl" [alt]="pet.name || 'Pet image'" (error)="$any($event.target).style.display='none'" />
+		</div>
+
+	<div class="pet-info">
+		<header>
+					<h2>{{ pet.name }} <span class="badge" [ngClass]="{
+						'available': pet.status === 'AVAILABLE',
+						'pending': pet.status === 'PENDING',
+						'adopted': pet.status === 'ADOPTED'
+					}">{{ pet.status }}</span></h2>
+					<div class="meta">{{ pet.species }} • {{ pet.breed }} • {{ pet.age }} years • {{ pet.gender }}</div>
+		</header>
+
+		<div class="description">
+			<strong>Description</strong>
+			<p *ngIf="pet.description; else noDesc">{{ pet.description }}</p>
+			<ng-template #noDesc><p class="muted">No description provided.</p></ng-template>
+		</div>
+
+		<div class="actions">
+			<button (click)="goEdit()" [disabled]="actionPending">Edit</button>
+			<button class="danger" (click)="deletePet()" [disabled]="actionPending">Delete</button>
+					<button class="secondary" (click)="markAsAdopted()" [disabled]="actionPending || pet.status === 'ADOPTED'">
+						{{ pet.status === 'ADOPTED' ? 'Adopted' : 'Mark as Adopted' }}
+			</button>
+		</div>
+	</div>
+</section>
+
+<ng-template #loadingOrError>
+	<div *ngIf="loading">Loading pet...</div>
+	<div *ngIf="!loading && errorMessage" class="error">{{ errorMessage }}</div>
+</ng-template>

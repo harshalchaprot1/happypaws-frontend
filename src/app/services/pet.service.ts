@@ -1,4 +1,3 @@
-// services/pet.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Pet } from '../models/pet.model';
@@ -22,6 +21,14 @@ export class PetService {
 
   updatePet(id: number, pet: Pet): Observable<Pet> {
     return this.http.put<Pet>(`${this.apiUrl}/${id}`, pet);
+  }
+
+  getPetById(id: number): Observable<Pet> {
+    return this.http.get<Pet>(`${this.apiUrl}/${id}`);
+  }
+
+  deletePet(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
   markAsAdopted(id: number): Observable<void> {

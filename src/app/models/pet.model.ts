@@ -1,6 +1,6 @@
 // src/app/models/pet.model.ts
 export interface Pet {
-  id: number;
+  id?: number;
   name: string;
   species: string;
   breed: string;

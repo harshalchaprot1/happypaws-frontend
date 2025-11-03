@@ -1,8 +1,12 @@
 <!-- src/app/components/pet-list/pet-list.component.html -->
 <h2>Available Pets for Adoption</h2>
+<div>
+  <input [(ngModel)]="searchText" placeholder="Search by name or breed" />
+</div>
 <div *ngIf="pets.length === 0">Loading pets...</div>
+<div *ngIf="pets.length > 0 && filteredPets.length === 0">No results found.</div>
 
-<div *ngFor="let pet of pets" class="pet-card">
+<div *ngFor="let pet of filteredPets" class="pet-card">
   <img [src]="pet.imageUrl" alt="{{ pet.name }}" width="150" />
   <h3>{{ pet.name }} ({{ pet.species }})</h3>
   <p><strong>Breed:</strong> {{ pet.breed }}</p>
@@ -10,4 +14,10 @@
   <p><strong>Gender:</strong> {{ pet.gender }}</p>
   <p><strong>Description:</strong> {{ pet.description }}</p>
   <p><strong>Status:</strong> {{ pet.status }}</p>
+  <div>
+    <button (click)="adoptPet(pet.id!)" [disabled]="pet.status === 'ADOPTED'">
+      {{ pet.status === 'ADOPTED' ? 'Adopted' : 'Mark as Adopted' }}
+    </button>
+    <button (click)="deletePet(pet.id)">Delete</button>
+  </div>
 </div>
