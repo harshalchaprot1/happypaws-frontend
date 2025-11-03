@@ -77,6 +77,7 @@ export class PetListComponent implements OnInit {
     const search = this.searchText.toLowerCase();
     return this.pets.filter(p =>
       (p.name?.toLowerCase().includes(search) ||
+       p.species?.toLowerCase().includes(search) ||
        p.breed?.toLowerCase().includes(search))
     );
   }

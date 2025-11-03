@@ -5,6 +5,11 @@ import { PetListComponent } from './components/pet-list/pet-list.component';
 export const routes: Routes = [
   { path: '', component: PetListComponent },
   {
+    path: 'dashboard',
+    loadComponent: () =>
+      import('./components/dashboard/dashboard.component').then(m => m.DashboardComponent),
+  },
+  {
     path: 'add',
     loadComponent: () =>
       import('./components/pet-form/pet-form.component').then(m => m.PetFormComponent),

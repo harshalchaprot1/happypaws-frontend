@@ -1,0 +1,249 @@
+<div class="dashboard-container">
+  <!-- Header -->
+  <div class="dashboard-header">
+    <h1>
+      <mat-icon>dashboard</mat-icon>
+      Admin Dashboard
+    </h1>
+    <p class="subtitle">Pet Adoption Overview & Statistics</p>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner></mat-spinner>
+    <p>Loading dashboard data...</p>
+  </div>
+
+  <!-- Dashboard Content -->
+  <div *ngIf="!loading" class="dashboard-content">
+    
+    <!-- Stats Cards Grid -->
+    <div class="stats-grid">
+      <!-- Total Pets -->
+      <mat-card class="stat-card primary">
+        <mat-card-content>
+          <div class="stat-icon">
+            <mat-icon>pets</mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>Total Pets</h3>
+            <p class="stat-value">{{ stats.totalPets }}</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Available Pets -->
+      <mat-card class="stat-card success">
+        <mat-card-content>
+          <div class="stat-icon">
+            <mat-icon>check_circle</mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>Available</h3>
+            <p class="stat-value">{{ stats.availablePets }}</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Adopted Pets -->
+      <mat-card class="stat-card accent">
+        <mat-card-content>
+          <div class="stat-icon">
+            <mat-icon>favorite</mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>Adopted</h3>
+            <p class="stat-value">{{ stats.adoptedPets }}</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Adoption Rate -->
+      <mat-card class="stat-card warning">
+        <mat-card-content>
+          <div class="stat-icon">
+            <mat-icon>trending_up</mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>Adoption Rate</h3>
+            <p class="stat-value">{{ getAdoptionRate() }}%</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Species Distribution -->
+    <mat-card class="info-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>category</mat-icon>
+          Species Distribution
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="species-grid">
+          <div class="species-item">
+            <mat-icon class="species-icon dog">pets</mat-icon>
+            <div class="species-info">
+              <span class="species-label">Dogs</span>
+              <span class="species-count">{{ stats.dogs }}</span>
+            </div>
+          </div>
+          <div class="species-item">
+            <mat-icon class="species-icon cat">pets</mat-icon>
+            <div class="species-info">
+              <span class="species-label">Cats</span>
+              <span class="species-count">{{ stats.cats }}</span>
+            </div>
+          </div>
+          <div class="species-item">
+            <mat-icon class="species-icon bird">flutter_dash</mat-icon>
+            <div class="species-info">
+              <span class="species-label">Birds</span>
+              <span class="species-count">{{ stats.birds }}</span>
+            </div>
+          </div>
+          <div class="species-item">
+            <mat-icon class="species-icon other">pets</mat-icon>
+            <div class="species-info">
+              <span class="species-label">Others</span>
+              <span class="species-count">{{ stats.others }}</span>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Two Column Layout -->
+    <div class="two-column-layout">
+      <!-- Top Breeds -->
+      <mat-card class="info-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>star</mat-icon>
+            Top 5 Breeds
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="breed-list">
+            <div *ngFor="let breed of topBreeds; let i = index" class="breed-item">
+              <span class="breed-rank">{{ i + 1 }}</span>
+              <span class="breed-name">{{ breed.breed }}</span>
+              <mat-chip class="breed-count">{{ breed.count }}</mat-chip>
+            </div>
+            <div *ngIf="topBreeds.length === 0" class="no-data">
+              <mat-icon>info</mat-icon>
+              <p>No breed data available</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Status Summary -->
+      <mat-card class="info-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>pie_chart</mat-icon>
+            Status Summary
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="status-bars">
+            <div class="status-bar-item">
+              <div class="status-bar-header">
+                <span>Available</span>
+                <span class="status-count">{{ stats.availablePets }}</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill available" 
+                     [style.width.%]="(stats.availablePets / stats.totalPets) * 100">
+                </div>
+              </div>
+            </div>
+            <div class="status-bar-item">
+              <div class="status-bar-header">
+                <span>Adopted</span>
+                <span class="status-count">{{ stats.adoptedPets }}</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill adopted" 
+                     [style.width.%]="(stats.adoptedPets / stats.totalPets) * 100">
+                </div>
+              </div>
+            </div>
+            <div class="status-bar-item">
+              <div class="status-bar-header">
+                <span>Pending</span>
+                <span class="status-count">{{ stats.pendingPets }}</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill pending" 
+                     [style.width.%]="(stats.pendingPets / stats.totalPets) * 100">
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Recent Pets Table -->
+    <mat-card class="info-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>schedule</mat-icon>
+          Recently Added Pets
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <table mat-table [dataSource]="recentPets" class="recent-pets-table">
+          
+          <!-- Name Column -->
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>Name</th>
+            <td mat-cell *matCellDef="let pet">
+              <strong>{{ pet.name }}</strong>
+            </td>
+          </ng-container>
+
+          <!-- Species Column -->
+          <ng-container matColumnDef="species">
+            <th mat-header-cell *matHeaderCellDef>Species</th>
+            <td mat-cell *matCellDef="let pet">{{ pet.species }}</td>
+          </ng-container>
+
+          <!-- Breed Column -->
+          <ng-container matColumnDef="breed">
+            <th mat-header-cell *matHeaderCellDef>Breed</th>
+            <td mat-cell *matCellDef="let pet">{{ pet.breed }}</td>
+          </ng-container>
+
+          <!-- Age Column -->
+          <ng-container matColumnDef="age">
+            <th mat-header-cell *matHeaderCellDef>Age</th>
+            <td mat-cell *matCellDef="let pet">{{ pet.age }} yrs</td>
+          </ng-container>
+
+          <!-- Status Column -->
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let pet">
+              <mat-chip [ngClass]="getStatusClass(pet.status)">
+                {{ pet.status }}
+              </mat-chip>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+        
+        <div *ngIf="recentPets.length === 0" class="no-data">
+          <mat-icon>pets</mat-icon>
+          <p>No pets added yet</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+  </div>
+</div>
